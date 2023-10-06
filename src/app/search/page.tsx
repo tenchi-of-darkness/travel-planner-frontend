@@ -14,7 +14,8 @@ export default function Search() {
     const searchParams = useSearchParams()
     const searchValue = searchParams.get("search")
     const query = useQuery("search" + searchValue, async () => {
-        return (await fetch(`https://localhost:7236/api/trails/search?searchValue=${searchValue}&page=1&pageSize=15`)).json()
+        const searchValueString = searchValue !== null && searchValue.length > 0 ? `SearchValue=${searchValue}&` : "";
+        return (await fetch(`https://localhost:7236/api/trails?${searchValueString}Page=1&PageSize=15`)).json()
     });
 
     const items = [];
