@@ -4,11 +4,11 @@ import Image from 'next/image'
 import React from "react";
 import {Input} from "@nextui-org/input";
 import {SearchIcon} from "@nextui-org/shared-icons";
-import SearchComponent from "../../../Components/Search/SearchComponent";
-import HeaderComponent from "../../../Components/HeaderComponent";
+import Search from "@/components/search/search";
+import Header from "../../components/header";
 import {useQuery} from "react-query";
 import {useSearchParams} from "next/navigation";
-import CardComponent from "../../../Components/CardComponent/CardComponent";
+import Card from "@/components/card/card";
 
 export default function Search() {
     const searchParams = useSearchParams()
@@ -21,8 +21,8 @@ export default function Search() {
     const items = [];
     if (query.isSuccess && query.data) {
         for (const item of query.data) {
-            items.push(<CardComponent title={item.title} description={item.description}
-                                      locationName={item.locatonName}/>)
+            items.push(<Card title={item.title} description={item.description}
+                             locationName={item.locatonName}/>)
         }
     }
 

@@ -5,7 +5,7 @@ import {SearchIcon} from "@nextui-org/shared-icons";
 import {useRouter} from "next/navigation";
 import {set} from "zod";
 
-const SearchComponent = () => {
+const Search = () => {
     const router = useRouter();
     const [value, setValue] = useState("");
 
@@ -58,4 +58,4 @@ const SearchComponent = () => {
     );
 }
 
-export default SearchComponent;
+export default Search;
