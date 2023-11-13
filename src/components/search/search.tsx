@@ -18,9 +18,9 @@ const Search = () => {
                 onChange={(e) => {
                     setValue(e.target.value);
                 }}
-                onKeyDown={async (e) => {
+                onKeyDown={ (e) => {
                     if(e.key === "Enter"){
-                        await router.push(`/search?search=${value}`)
+                         router.push(`/search?search=${value}`)
                     }
                 }}
                 classNames={{
@@ -46,8 +46,8 @@ const Search = () => {
                 }}
                 placeholder="Type to search..."
                 startContent={
-                    <div onClick={async () => {
-                        await router.push(`/search?search=${value}`)
+                    <div onClick={ () => {
+                        router.push(`/search?search=${value}`)
                     }}>
                         <SearchIcon
                             className="text-black/50 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0"/>

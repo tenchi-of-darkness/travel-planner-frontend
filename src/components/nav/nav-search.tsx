@@ -19,15 +19,15 @@ export function NavSearch() {
                 onChange={(e) => {
                     setValue(e.target.value);
                 }}
-                onKeyDown={async (e) => {
+                onKeyDown={ (e) => {
                     if (e.key === "Enter") {
-                        await router.push(`/search?search=${value}`)
+                         router.push(`/search?search=${value}`)
                     }
                 }}
             />
             <svg
-                onClick={async () => {
-                    await router.push(`/search?search=${value}`)
+                onClick={ () => {
+                     router.push(`/search?search=${value}`)
                 }}
                 className="absolute mr-2 w-10 w-4 h-4 text-gray-500 dark:text-gray-400"
                 aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
