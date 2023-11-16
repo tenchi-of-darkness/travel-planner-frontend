@@ -14,7 +14,7 @@ export default function Search() {
     const searchValue = searchParams.get("search")
     const query = useQuery("search" + searchValue, async () => {
         const searchValueString = searchValue !== null && searchValue.length > 0 ? `SearchValue=${searchValue}&` : "";
-        return (await fetch(`https://localhost:7236/api/trails?${searchValueString}Page=1&PageSize=15`)).json()
+        return (await fetch(`https://localhost:7026/hike-service/trail?${searchValueString}Page=1&PageSize=15`)).json()
     });
 
     const items = [];

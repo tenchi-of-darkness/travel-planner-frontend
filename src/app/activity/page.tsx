@@ -11,14 +11,14 @@ import Card from "@/components/card/card";
 
 export default function Trail() {
 
-    const query = useQuery("trails", async () => {
-        return (await fetch(`https://localhost:7026/hike-service/trail?Page=1&PageSize=15`)).json()
+    const query = useQuery("activity", async () => {
+        return (await fetch(`https://localhost:7026/activity-service/activity?Page=1&PageSize=15`)).json()
     });
 
     const items = [];
     if (query.isSuccess && query.data) {
         for (const item of query.data) {
-            items.push(<Card title={item.title} description={item.description}
+            items.push(<Card title={item.name} description={item.description}
                              locationName={item.locationName}/>)
         }
     }
