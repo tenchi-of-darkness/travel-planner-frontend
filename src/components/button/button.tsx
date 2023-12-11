@@ -1,8 +1,8 @@
 'use client'
 import * as React from "react"
 
-const Button = ({Text, onclick}) => {
-    return <button style={}>
-
-    </button>
-}
+// const Button = ({text, onClick}) => {
+//     return <button style={}>
+//
+//     </button>
+// }
