@@ -10,7 +10,8 @@ export default function Login() {
         <main>
             <Button onClick={async () => {
                 const auth = getAuth();
-                const result = await signInWithPopup(auth, provider);
+                const result = await signOut(auth);
+
             }}>Button</Button>
         </main>
     )
