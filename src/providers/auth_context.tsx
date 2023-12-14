@@ -1,19 +1,15 @@
-import React from 'react';
+'use client'
 
-interface AuthContext {
-    login: () => {};
-    logout: () => {};
-    token: string;
+import React, {createContext} from 'react';
+
+const AuthContext = createContext<AuthContextProps>({
+    logout: () => {},
+    token: null
+});
+
+export interface AuthContextProps {
+    logout: () => void;
+    token: string|null;
 }
 
-interface AuthProviderProps {
-    context: AuthContext;
-}
-
-function AuthProvider(props: AuthProviderProps) {
-    return (
-        <div></div>
-    );
-}
-
-export default AuthProvider;
+export default AuthContext;

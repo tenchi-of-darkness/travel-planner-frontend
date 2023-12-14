@@ -1,18 +1,20 @@
 'use client';
-import React from "react";
+import React, {Dispatch, SetStateAction, useContext} from "react";
 import {Button} from "@/components/ui/button"
 import {getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, UserCredential} from "firebase/auth";
 import {Simulate} from "react-dom/test-utils";
 import error = Simulate.error;
 import {FirebaseError, FirebaseOptions, initializeApp} from "@firebase/app";
 import firebaseConfig from "@/config/firebase";
+import AuthContext, {AuthContextProps} from "@/providers/auth_context";
 
 const provider = new GoogleAuthProvider();
 
-export default function Login() {
+export default function Login({setAuthContext}: { setAuthContext:  Dispatch<SetStateAction<AuthContextProps>> }) {
+    const auth = useContext(AuthContext);
     return (
         <main>
-            <Button onClick={async () => {
+            {auth.token==null?<Button onClick={async () => {
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
 
@@ -20,14 +22,24 @@ export default function Login() {
                     const result = await signInWithPopup(auth, provider);
 
                     const credential = GoogleAuthProvider.credentialFromResult(result);
-                    const token = credential?.accessToken;
-                    const user = result.user;
+                    const token: string = credential?.idToken as string;
 
+                    setAuthContext({
+                        logout: () => {
+                            setAuthContext({
+                                logout: () => {
+
+                                },
+                                token: null
+                            })
+                        },
+                        token: token
+                    });
                 } catch (e: any){
 
                 }
             }}
-            >Login</Button>
+            >Login</Button>:<Button onClick={auth.logout}>Logout</Button>}
         </main>
     )
 }

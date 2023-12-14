@@ -1,6 +1,11 @@
-import React from "react";
+'use client'
+
+import React, {useContext} from "react";
+import AuthContext from "@/providers/auth_context";
 
 export default function Page() {
+  const auth = useContext(AuthContext);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
