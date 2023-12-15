@@ -16,8 +16,8 @@ export default function Trail() {
     });
 
     const items = [];
-    if (query.isSuccess && query.data) {
-        for (const item of query.data) {
+    if (query.isSuccess && query.data.trails) {
+        for (const item of query.data.trails) {
             items.push(<Card title={item.title} description={item.description}
                              locationName={item.locationName}/>)
         }
