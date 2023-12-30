@@ -22,7 +22,7 @@ export default function Login({setAuthContext}: { setAuthContext:  Dispatch<SetS
                     const result = await signInWithPopup(auth, provider);
 
                     const credential = GoogleAuthProvider.credentialFromResult(result);
-                    const token: string = credential?.idToken as string;
+                    const token: string = await result.user.getIdToken();
 
                     setAuthContext({
                         logout: () => {

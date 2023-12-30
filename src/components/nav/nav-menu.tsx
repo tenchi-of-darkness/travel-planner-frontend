@@ -43,6 +43,15 @@ export function NavMenu() {
                         </NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <Link href={{
+                        pathname: '/profile',
+                    }}  legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            Profile
+                        </NavigationMenuLink>
+                    </Link>
+                </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>
     )
