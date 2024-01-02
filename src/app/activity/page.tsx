@@ -8,11 +8,12 @@ import Header from "../../components/header";
 import {useQuery} from "react-query";
 import {useSearchParams} from "next/navigation";
 import Card from "@/components/card/card";
+import {baseApiUrl} from "@/config/base_url";
 
 export default function Trail() {
 
     const query = useQuery("activity", async () => {
-        return (await fetch(`${baseUrl}/activity-service/activity?Page=1&PageSize=15`)).json()
+        return (await fetch(`${baseApiUrl}/activity-service/activity?Page=1&PageSize=15`)).json()
     });
 
     const items = [];

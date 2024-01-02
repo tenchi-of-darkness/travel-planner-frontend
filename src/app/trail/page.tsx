@@ -1,18 +1,14 @@
 'use client';
 
-import Image from 'next/image'
 import React from "react";
-import {Input} from "@nextui-org/input";
-import {SearchIcon} from "@nextui-org/shared-icons";
-import Header from "../../components/header";
 import {useQuery} from "react-query";
-import {useSearchParams} from "next/navigation";
 import Card from "@/components/card/card";
+import {baseApiUrl} from "@/config/base_url";
 
 export default function Trail() {
 
     const query = useQuery("trails", async () => {
-        return (await fetch(`${baseUrl}/hike-service/trail?Page=1&PageSize=15`)).json()
+        return (await fetch(`${baseApiUrl}/hike-service/trail?Page=1&PageSize=15`)).json()
     });
 
     const items = [];

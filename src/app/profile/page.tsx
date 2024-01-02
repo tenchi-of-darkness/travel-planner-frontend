@@ -3,6 +3,7 @@ import React, {useContext} from 'react'
 import Card from "@/components/card/card";
 import {useQuery} from "react-query";
 import AuthContext from "@/providers/auth_context";
+import {baseApiUrl} from "@/config/base_url";
 
 interface UserProfileProps {
     username: string;
@@ -13,7 +14,7 @@ interface UserProfileProps {
 export default function Page() {
     const auth = useContext(AuthContext)
     const query = useQuery(["profile", auth.token], async () => {
-        const response = await fetch(`${baseUrl}/user-service/user`, {headers: {Authorization: "Bearer "+auth.token}});
+        const response = await fetch(`${baseApiUrl}/user-service/user`, {headers: {Authorization: "Bearer "+auth.token}});
         console.log(auth.token)
         return response.json();
     }, {enabled: auth.token!==null});

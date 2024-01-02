@@ -8,13 +8,14 @@ import Header from "../../components/header";
 import {useQuery} from "react-query";
 import {useSearchParams} from "next/navigation";
 import Card from "@/components/card/card";
+import {baseApiUrl} from "@/config/base_url";
 
 export default function Search() {
     const searchParams = useSearchParams()
     const searchValue = searchParams.get("search")
     const query = useQuery("search" + searchValue, async () => {
         const searchValueString = searchValue !== null && searchValue.length > 0 ? `SearchValue=${searchValue}&` : "";
-        return (await fetch(`${baseUrl}/hike-service/trail?${searchValueString}Page=1&PageSize=15`)).json()
+        return (await fetch(`${baseApiUrl}/hike-service/trail?${searchValueString}Page=1&PageSize=15`)).json()
     });
 
     const items = [];

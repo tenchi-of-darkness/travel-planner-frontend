@@ -3,10 +3,11 @@
 import React from "react";
 
 import {useQuery} from "react-query";
+import {baseApiUrl} from "@/config/base_url";
 
 export default function Page({params}: {params:{id:string}}){
     const query = useQuery(["profile", params.id], async() => {
-        return(await fetch(`${baseUrl}/hike-service/trail/${params.id}/`)).text()
+        return(await fetch(`${baseApiUrl}/hike-service/trail/${params.id}/`)).text()
     });
 
     return (
