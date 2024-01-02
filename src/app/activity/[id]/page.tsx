@@ -6,7 +6,7 @@ import {useQuery} from "react-query";
 
 export default function Page({params}: {params:{id:string}}){
     const query = useQuery(["trail", params.id], async() => {
-        return(await fetch(`https://localhost:7236/api/trail/${params.id}/`)).text()
+        return(await fetch(`${baseUrl}/hike-service/trail/${params.id}/`)).text()
     });
 
     return (

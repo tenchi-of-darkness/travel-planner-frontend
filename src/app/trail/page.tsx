@@ -12,7 +12,7 @@ import Card from "@/components/card/card";
 export default function Trail() {
 
     const query = useQuery("trails", async () => {
-        return (await fetch(`https://localhost:7026/hike-service/trail?Page=1&PageSize=15`)).json()
+        return (await fetch(`${baseUrl}/hike-service/trail?Page=1&PageSize=15`)).json()
     });
 
     const items = [];

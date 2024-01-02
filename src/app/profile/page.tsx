@@ -13,7 +13,7 @@ interface UserProfileProps {
 export default function Page() {
     const auth = useContext(AuthContext)
     const query = useQuery(["profile", auth.token], async () => {
-        const response = await fetch(`https://localhost:7026/user-service/user`, {headers: {Authorization: "Bearer "+auth.token}});
+        const response = await fetch(`${baseUrl}/user-service/user`, {headers: {Authorization: "Bearer "+auth.token}});
         console.log(auth.token)
         return response.json();
     }, {enabled: auth.token!==null});
