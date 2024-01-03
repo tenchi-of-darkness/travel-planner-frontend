@@ -2,7 +2,7 @@
 import { Page } from 'playwright';
 
 const USER_EMAIL = 'melTestSpam@gmail.com';
-const USER_PASSWORD ='68a~4YN,XC}X';
+const USER_PASSWORD = '';
 
 export async function logInWithGoogle(page: Page) {
     // Click on the "Login with Google" button which should open a new popup
