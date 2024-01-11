@@ -4,6 +4,9 @@ import React from "react";
 import {useQuery} from "react-query";
 import Card from "@/components/card/card";
 import {baseApiUrl} from "@/config/base_url";
+import {Button} from "@/components/ui/button";
+import {NavigationMenuLink, navigationMenuTriggerStyle} from "@/components/ui/navigation-menu";
+import Link from "next/link";
 
 export default function Trail() {
 
@@ -31,6 +34,16 @@ export default function Trail() {
 
     return (
         <main>
+
+            <Button asChild>
+                <Link href={{
+                    pathname: '/trail/add',
+                }}>
+                    Add Trail
+                </Link>
+            </Button>
+
+
             <div className="grid grid-cols-4 p-24 gap-5">
                 {query.isSuccess ? <div>{items.length > 0 ? items : "No results found"}</div> : <div>is loading</div>}
             </div>

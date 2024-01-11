@@ -5,7 +5,7 @@ const Map = dynamic(() => import('@/app/map/map'), {
 })
 
 export default function Page() {
-    return <div>
+    return <div style={{height:"100vh"}}>
         <Map/>
     </div>
 }
