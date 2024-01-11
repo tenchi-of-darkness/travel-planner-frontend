@@ -22,7 +22,7 @@ export default function Map() {
         if (!(mapRef.current == null || location.latitude === null)) {
             mapRef.current.flyTo([location.latitude, location.longitude])
         }
-    }, [location.latitude])
+    }, [location.latitude, location.longitude])
 
     SignalRContext.useSignalREffect(
         "ReceiveLocation", // Your Event Key

@@ -57,7 +57,7 @@ export default function Page() {
         setNotInForm(x => {
             return {start: {coordinates: [location.latitude, location.longitude], type: "Point"}, end: x.end}
         })
-    }, [location.latitude])
+    }, [location.latitude, location.longitude])
 
     const onNewPoint = (point: Point) => {
         setNotInForm(x => {
