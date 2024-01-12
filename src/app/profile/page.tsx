@@ -83,7 +83,7 @@ export default function Page() {
                                 <FormItem>
                                     <FormLabel>Bio</FormLabel>
                                     <FormControl>
-                                        <Textarea {...field} />
+                                        <Textarea {...field} id={"bio"}/>
                                     </FormControl>
                                     <FormDescription>This is your public bio.</FormDescription>
                                     <FormMessage/>
