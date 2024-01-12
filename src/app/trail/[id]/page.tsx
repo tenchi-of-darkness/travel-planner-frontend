@@ -3,11 +3,11 @@
 import React from "react";
 
 import {useQuery} from "react-query";
-import {baseApiUrl} from "@/config/base_url";
+import TrailAPI from "@/api/trail";
 
 export default function Page({params}: {params:{id:string}}){
     const query = useQuery(["trail", params.id], async() => {
-        return(await fetch(`${baseApiUrl}/hike-service/trail/${params.id}/`)).text()
+        return(await TrailAPI.GetTrailById(parseInt(params.id))).text()
     });
 
     return (

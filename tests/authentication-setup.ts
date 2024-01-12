@@ -16,7 +16,10 @@ export async function logInWithGoogle(page: Page) {
     await popup.waitForSelector('input[type="password"]');
     await popup.fill('input[type="password"]', USER_PASSWORD);
     await popup.click('#passwordNext');
-
+    await popup
+        .waitForSelector(`input[type="password"]`, {timeout:0})
+        .then(() => {
+            console.log("Success")});
     await Promise.all([
         popup.waitForNavigation(),
         popup.press('input[type="password"]', 'Enter')

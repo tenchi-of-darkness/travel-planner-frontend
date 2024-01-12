@@ -3,15 +3,14 @@
 import React from "react";
 import {useQuery} from "react-query";
 import Card from "@/components/card/card";
-import {baseApiUrl} from "@/config/base_url";
 import {Button} from "@/components/ui/button";
-import {NavigationMenuLink, navigationMenuTriggerStyle} from "@/components/ui/navigation-menu";
 import Link from "next/link";
+import TrailAPI from "@/api/trail";
 
 export default function Trail() {
 
     const query = useQuery("trails", async () => {
-        return (await fetch(`${baseApiUrl}/hike-service/trail?Page=1&PageSize=15`)).json()
+        return (await TrailAPI.GetTrails()).json();
     });
 
     const items = [];
