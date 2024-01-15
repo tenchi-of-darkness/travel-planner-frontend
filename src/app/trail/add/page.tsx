@@ -1,6 +1,13 @@
-'use client'
+'use client';
 
-import React, {useContext, useEffect, useState} from "react";
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
+import * as L from 'leaflet';
+import 'leaflet-defaulticon-compatibility';
+import {MapContainer, Marker, TileLayer} from "react-leaflet";
+
+import useGeolocation from "react-hook-geolocation";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {useMutation} from "react-query";
 import AuthContext from "@/providers/auth_context";
 import {baseApiUrl} from "@/config/base_url";
@@ -12,8 +19,12 @@ import {Button} from "@/components/ui/button";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Point} from "geojson";
-import useGeolocation from "react-hook-geolocation";
 import {Slider} from "@/components/ui/slider";
+import dynamic from "next/dynamic";
+
+const Map = dynamic(() => import('@/app/trail/add/map'), {
+    ssr: false,
+})
 
 const formSchema = z.object({
     rating: z.number().min(0).max(10),
@@ -24,7 +35,7 @@ const formSchema = z.object({
     distanceInMeters: z.number().min(100)
 })
 
-interface NotInForm {
+export interface NotInForm {
     start: Point | null;
     end: Point | null;
 }
@@ -58,12 +69,6 @@ export default function Page() {
             return {start: {coordinates: [location.latitude, location.longitude], type: "Point"}, end: x.end}
         })
     }, [location.latitude, location.longitude])
-
-    const onNewPoint = (point: Point) => {
-        setNotInForm(x => {
-            return {start: x.start, end: point}
-        })
-    }
 
     const mutation = useMutation({
         mutationFn: async ({form, notInForm}: { form: z.infer<typeof formSchema>, notInForm: NotInForm }) => {
@@ -100,112 +105,114 @@ export default function Page() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <div className="z-10 max-w-5xl w-full items-center justify-between text-sm lg:flex">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)}>
-                        <FormField
-                            control={form.control}
-                            name="rating"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Rating {field.value}</FormLabel>
-                                    <FormControl>
-                                        <Slider onBlur={field.onBlur} disabled={field.disabled}
-                                                onValueChange={(arr) => field.onChange(arr[0])} ref={field.ref}
-                                                name={field.name} defaultValue={[field.value]} min={0} max={10}
-                                                step={1}/>
-                                    </FormControl>
-                                    <FormDescription></FormDescription>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+        <main className={"flex"}>
+            <Form {...form}>
+                <form className={"w-[30vw] p-24"} onSubmit={form.handleSubmit(onSubmit)}>
+                    <FormField
+                        control={form.control}
+                        name="rating"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Rating {field.value}</FormLabel>
+                                <FormControl>
+                                    <Slider onBlur={field.onBlur} disabled={field.disabled}
+                                            onValueChange={(arr) => field.onChange(arr[0])} ref={field.ref}
+                                            name={field.name} defaultValue={[field.value]} min={0} max={10}
+                                            step={1}/>
+                                </FormControl>
+                                <FormDescription></FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <FormField
-                            control={form.control}
-                            name="difficulty"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Difficulty {renderSwitch(field.value)}</FormLabel>
-                                    <FormControl>
-                                        <Slider onBlur={field.onBlur} disabled={field.disabled}
-                                                onValueChange={(arr) => field.onChange(arr[0])} ref={field.ref}
-                                                name={field.name} defaultValue={[field.value]} min={0} max={20}
-                                                step={10}/>
-                                    </FormControl>
-                                    <FormDescription></FormDescription>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <FormField
+                        control={form.control}
+                        name="difficulty"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Difficulty {renderSwitch(field.value)}</FormLabel>
+                                <FormControl>
+                                    <Slider onBlur={field.onBlur} disabled={field.disabled}
+                                            onValueChange={(arr) => field.onChange(arr[0])} ref={field.ref}
+                                            name={field.name} defaultValue={[field.value]} min={0} max={20}
+                                            step={10}/>
+                                </FormControl>
+                                <FormDescription></FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <FormField
-                            control={form.control}
-                            name="title"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Title</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormDescription></FormDescription>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <FormField
+                        control={form.control}
+                        name="title"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Title</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormDescription></FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Description</FormLabel>
-                                    <FormControl>
-                                        <Textarea {...field} />
-                                    </FormControl>
-                                    <FormDescription>Type the description of the trail here</FormDescription>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                    <Textarea {...field} />
+                                </FormControl>
+                                <FormDescription>Type the description of the trail here</FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <FormField
-                            control={form.control}
-                            name="locationName"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Location</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormDescription>This the starting location of your trail</FormDescription>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <FormField
+                        control={form.control}
+                        name="locationName"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Location</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormDescription>This the starting location of your trail</FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <FormField
-                            control={form.control}
-                            name="distanceInMeters"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Distance in meters</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} onChange={event => field.onChange(+event.target.value)}
-                                               type={"number"} min={100}/>
-                                    </FormControl>
-                                    <FormDescription></FormDescription>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                    <FormField
+                        control={form.control}
+                        name="distanceInMeters"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Distance in meters</FormLabel>
+                                <FormControl>
+                                    <Input {...field} onChange={event => field.onChange(+event.target.value)}
+                                           type={"number"} min={100}/>
+                                </FormControl>
+                                <FormDescription></FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                        <Button disabled={!form.formState.isValid || notInForm.start == null || notInForm.end == null}
-                                type="submit">Submit</Button>
-                    </form>
-                </Form>
-            </div>
+                    <Button
+                        disabled={!form.formState.isValid || notInForm.start == null || notInForm.end == null}
+                        type="submit">Submit</Button>
+                </form>
+            </Form>
+
+            <Map setNotInForm={setNotInForm} notInForm={notInForm} />
         </main>
+
     )
 }

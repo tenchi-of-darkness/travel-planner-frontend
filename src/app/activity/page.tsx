@@ -3,11 +3,12 @@ import React from "react";
 import {useQuery} from "react-query";
 import Card from "@/components/card/card";
 import {baseApiUrl} from "@/config/base_url";
+import ActivityAPI from "@/api/activity";
 
 export default function Activity() {
 
     const query = useQuery("activity", async () => {
-        return (await fetch(`${baseApiUrl}/activity-service/activity?Page=1&PageSize=15`)).json()
+        return await (await ActivityAPI.GetActivities(1))?.json()
     });
 
     const items = [];

@@ -1,39 +1,35 @@
 import {baseApiUrl} from "@/config/base_url";
 
 export default class TrailAPI {
-    static async GetTrailById(id: number): Promise<Response> {
+    static async GetTrailById(id: string): Promise<Response | void> {
         return await fetch(`${baseApiUrl}/hike-service/trail/${id}/`)
-            .then((res) => res.json())
             .catch((error) => {
                 console.log(error);
             });
     }
 
-    static async GetTrails(): Promise<Response> {
-        return await fetch(`${baseApiUrl}/hike-service/trail?Page=1&PageSize=15`)
-            .then((res) => res.json())
+    static async GetTrails(page: number): Promise<Response | void> {
+        return await fetch(`${baseApiUrl}/hike-service/trail?Page=${page}&PageSize=15`)
             .catch((error) => {
                 console.log(error);
             });
     }
 
-    static async GetUserTrails(): Promise<Response> {
+    static async GetUserTrails(): Promise<Response | void> {
         return await fetch(`${baseApiUrl}/hike-service/trail/user`)
-            .then((res) => res.json())
             .catch((error) => {
                 console.log(error);
             });
     }
 
-    static async GetFavoriteTrails(): Promise<Response> {
+    static async GetFavoriteTrails(): Promise<Response | void> {
         return await fetch(`${baseApiUrl}/hike-service/trail/favorite`)
-            .then((res) => res.json())
             .catch((error) => {
                 console.log(error);
             });
     }
 
-    static async CreateTrail(trail: any): Promise<Response> {
+    static async CreateTrail(trail: any): Promise<Response | void> {
         return await fetch(`${baseApiUrl}/hike-service/trail`, {
             method: 'POST',
             headers: {
@@ -41,7 +37,6 @@ export default class TrailAPI {
             },
             body: JSON.stringify(trail)
         })
-            .then((res) => res.json())
             .catch((error) => {
                 console.log(error);
             });

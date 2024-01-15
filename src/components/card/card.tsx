@@ -1,4 +1,4 @@
-import React from "react";
+import React, {HTMLAttributes} from "react";
 
 import {
     Card as InnerCard,
@@ -13,21 +13,21 @@ const cardStyle = {
   border: '',
 };
 
-interface CardProps{
+type CardProps = {
     title: string,
     description: string,
     locationName: string
-}
+} & HTMLAttributes<HTMLDivElement>
 
-const Card: React.FC<CardProps> = ({title, description, locationName}) => {
+const Card: React.FC<CardProps> = (props) => {
     return (
-        <InnerCard>
+        <InnerCard {...props}>
             <CardHeader>
-                <CardTitle>{title}</CardTitle>
-                <CardDescription>{locationName}</CardDescription>
+                <CardTitle>{props.title}</CardTitle>
+                <CardDescription>{props.locationName}</CardDescription>
             </CardHeader>
             <CardContent>
-                <p>{description}</p>
+                <p>{props.description}</p>
             </CardContent>
         </InnerCard>
         // <div className="bg-white shadow-md p-4 rounded-lg">

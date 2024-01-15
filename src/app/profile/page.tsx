@@ -10,6 +10,7 @@ import {Button} from "@/components/ui/button";
 import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Textarea} from "@/components/ui/textarea";
+import UserAPI from "@/api/user";
 
 const formSchema = z.object({
     userName: z.string().min(2 )
@@ -26,9 +27,9 @@ export default function Page() {
     })
     const auth = useContext(AuthContext)
     const query = useQuery(["profile", auth.token], async () => {
-        const response = await fetch(`${baseApiUrl}/user-service/user`, {headers: {Authorization: "Bearer " + auth.token}});
+        const response = await UserAPI.GetUser(auth.token!);
         console.log(auth.token)
-        return response.json();
+        return response!.json();
     }, {enabled: auth.token !== null});
 
     if (query.isLoading || !query.data) {
@@ -44,14 +45,9 @@ export default function Page() {
     let profile = query.data;
 
     async function onSubmit(values: z.infer<typeof formSchema>){
-        const response = await fetch(`${baseApiUrl}/user-service/user`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${auth.token}`,
-            },
-            body: JSON.stringify(values),
-        });
+        if(auth.token === null) return;
+
+        const response = await UserAPI.SetUser(values, auth.token);
         await query.refetch();
     }
 

@@ -4,10 +4,11 @@ import React from "react";
 
 import {useQuery} from "react-query";
 import {baseApiUrl} from "@/config/base_url";
+import ActivityAPI from "@/api/activity";
 
 export default function Page({params}: {params:{id:string}}){
     const query = useQuery(["activity", params.id], async() => {
-        return(await fetch(`${baseApiUrl}/activity-service/activity/${params.id}/`)).text()
+        return await (await ActivityAPI.GetActivityById(params.id))?.text()
     });
 
     return (
