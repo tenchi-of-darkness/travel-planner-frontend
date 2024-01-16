@@ -32,6 +32,7 @@ export default function Trail() {
         for (const item of query.data) {
             items.push(<Card title={item.title} description={item.description}
                              locationName={item.locationName}
+                             key={item.id}
                              onClick={() => {
                                  router.push("/trail/"+item.id);
                              }}/>)
