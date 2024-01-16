@@ -1,11 +1,5 @@
 'use client';
 
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
-import * as L from 'leaflet';
-import 'leaflet-defaulticon-compatibility';
-import {MapContainer, Marker, TileLayer} from "react-leaflet";
-
 import useGeolocation from "react-hook-geolocation";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {useMutation} from "react-query";
