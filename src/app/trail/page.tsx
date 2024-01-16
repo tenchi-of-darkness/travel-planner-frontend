@@ -84,7 +84,7 @@ export default function Trail() {
                         <PaginationPrevious href={"/trail?page=" + (page - 1)}/>
                     </PaginationItem> : null}
 
-                    <PaginationItem>
+                    <PaginationItem >
                         <PaginationLink href="/trail?page=1">1</PaginationLink>
                     </PaginationItem>
 
@@ -92,7 +92,7 @@ export default function Trail() {
                         <PaginationEllipsis/>
                     </PaginationItem> : null}
 
-                    {showPages.map((innerPage) => <PaginationItem>
+                    {showPages.map((innerPage) => <PaginationItem key={"page-"+innerPage}>
                         <PaginationLink href={"/trail?page=" + (innerPage)}>{innerPage}</PaginationLink>
                     </PaginationItem>)}
 
