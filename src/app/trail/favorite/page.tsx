@@ -25,8 +25,8 @@ export default function Trail() {
     const auth = useContext(AuthContext);
     const page = parseInt(searchParams.get("page") || "1");
 
-    const query = useQuery(["trails", page], async () => {
-        return await (await TrailAPI.GetTrails(page))?.json();
+    const query = useQuery(["trailsFavorite", auth.token, page], async () => {
+        return await (await TrailAPI.GetFavoriteTrails(page, auth.token!))?.json();
     });
 
     const items = [];

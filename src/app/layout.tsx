@@ -14,7 +14,8 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
     const [authContext, setAuthContext] = useState<AuthContextProps>({
         logout: () => {
         },
-        token: null
+        token: null,
+        decodedToken: null,
     });
 
     return (

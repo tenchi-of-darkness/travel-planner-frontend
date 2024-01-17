@@ -200,7 +200,7 @@ export default function Page() {
                     />
 
                     <Button
-                        disabled={!form.formState.isValid || notInForm.start == null || notInForm.end == null}
+                        disabled={!auth.token || !form.formState.isValid || notInForm.start == null || notInForm.end == null}
                         type="submit">Submit</Button>
                 </form>
             </Form>

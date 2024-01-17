@@ -1,15 +1,46 @@
 'use client'
 
-import React from "react";
+import React, {useContext, useDebugValue} from "react";
 
-import {useQuery} from "react-query";
+import {useMutation, useQuery} from "react-query";
 import TrailAPI from "@/api/trail";
 import Card from "@/components/card/card";
+import {Button} from "@/components/ui/button";
+import {HeartFilledIcon, HeartIcon} from "@radix-ui/react-icons";
+import AuthContext from "@/providers/auth_context";
+import * as z from "zod";
+import {baseApiUrl} from "@/config/base_url";
+import {NotInForm} from "@/app/trail/add/page";
 
 export default function Page({params}: { params: { id: string } }) {
-    const query = useQuery(["trail", params.id], async () => {
-        return (await TrailAPI.GetTrailById(params.id))?.json()
+    const auth = useContext(AuthContext);
+    const query = useQuery(["trail", params.id, auth.token], async () => {
+        return (await TrailAPI.GetTrailById(params.id, auth.token))?.json()
     });
+
+    const favoriteMutation = useMutation({
+        mutationFn: async ({favorite}: { favorite: boolean }) => {
+            if (favorite) {
+                return await fetch(`${baseApiUrl}/hike-service/trail/${params.id}/favorite`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${auth.token}`,
+                    },
+                    body: null,
+                }).then(async x => await query.refetch());
+            } else {
+                return await fetch(`${baseApiUrl}/hike-service/trail/${params.id}/favorite`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${auth.token}`,
+                    },
+                    body: null,
+                }).then(async x => await query.refetch());
+            }
+        },
+    })
 
     if (!(query.isSuccess && query.data)) {
         return (
@@ -31,10 +62,21 @@ export default function Page({params}: { params: { id: string } }) {
         )
     }
 
+    console.log(query.data)
+
     return (
         <main className={"p-24"}>
             <div>Title: {query.data.title}</div>
             <div>Location: {query.data.locationName}</div>
+            <div>
+                <Button disabled={favoriteMutation.isLoading} variant="outline" size="icon" onClick={() => {
+                    favoriteMutation.mutate({favorite: !query.data.isFavorite});
+                }} >
+                    {query.data.isFavorite ?
+                        <HeartFilledIcon className="h-4 w-4"/> :
+                        <HeartIcon className="h-4 w-4"/>}
+                </Button>
+            </div>
         </main>
     )
 }

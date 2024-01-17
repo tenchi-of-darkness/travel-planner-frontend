@@ -1,6 +1,6 @@
 'use client'
 import React, {useContext} from 'react'
-import {useQuery} from "react-query";
+import {useQuery, useQueryClient} from "react-query";
 import AuthContext from "@/providers/auth_context";
 import {baseApiUrl} from "@/config/base_url";
 import {useForm} from "react-hook-form";
@@ -11,6 +11,16 @@ import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Textarea} from "@/components/ui/textarea";
 import UserAPI from "@/api/user";
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuIndicator,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+    NavigationMenuViewport,
+} from "@/components/ui/navigation-menu"
 
 const formSchema = z.object({
     userName: z.string().min(2 )
@@ -19,6 +29,7 @@ const formSchema = z.object({
 })
 
 export default function Page() {
+    const queryClient = useQueryClient();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -26,29 +37,12 @@ export default function Page() {
         },
     })
     const auth = useContext(AuthContext)
-    const query = useQuery(["profile", auth.token], async () => {
-        const response = await UserAPI.GetUser(auth.token!);
-        console.log(auth.token)
-        return response!.json();
-    }, {enabled: auth.token !== null});
-
-    if (query.isLoading || !query.data) {
-        return (
-            <main className="flex min-h-screen flex-col items-center justify-between p-24">
-                <div className="z-10 max-w-5xl w-full items-center justify-between text-sm lg:flex">
-                    <div>Loading...</div>
-                </div>
-            </main>
-        )
-    }
-
-    let profile = query.data;
 
     async function onSubmit(values: z.infer<typeof formSchema>){
         if(auth.token === null) return;
 
         const response = await UserAPI.SetUser(values, auth.token);
-        await query.refetch();
+        await queryClient.refetchQueries(["profile", auth.token]);
     }
 
 
@@ -90,12 +84,6 @@ export default function Page() {
                         <Button type="submit">Submit</Button>
                     </form>
                 </Form>
-                <div>
-                    {profile.userName}
-                </div>
-                <div>
-                    {profile.bio}
-                </div>
             </div>
         </main>
     )
