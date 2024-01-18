@@ -11,12 +11,19 @@ import AuthContext from "@/providers/auth_context";
 import * as z from "zod";
 import {baseApiUrl} from "@/config/base_url";
 import {NotInForm} from "@/app/trail/add/page";
+import dynamic from "next/dynamic";
+import {useRouter} from "next/navigation";
+
+const Map = dynamic(() => import('@/app/trail/[id]/map'), {
+    ssr: false,
+})
 
 export default function Page({params}: { params: { id: string } }) {
     const auth = useContext(AuthContext);
     const query = useQuery(["trail", params.id, auth.token], async () => {
         return (await TrailAPI.GetTrailById(params.id, auth.token))?.json()
     });
+    const router = useRouter();
 
     const favoriteMutation = useMutation({
         mutationFn: async ({favorite}: { favorite: boolean }) => {
@@ -67,15 +74,25 @@ export default function Page({params}: { params: { id: string } }) {
     return (
         <main className={"p-24"}>
             <div>Title: {query.data.title}</div>
+            <div>Description: {query.data.description}</div>
+            <div>Difficulty: {query.data.difficulty}</div>
+            <div>Distance in meters: {query.data.distanceInMeters}</div>
             <div>Location: {query.data.locationName}</div>
             <div>
                 <Button disabled={favoriteMutation.isLoading} variant="outline" size="icon" onClick={() => {
                     favoriteMutation.mutate({favorite: !query.data.isFavorite});
-                }} >
+                }}>
                     {query.data.isFavorite ?
                         <HeartFilledIcon className="h-4 w-4"/> :
                         <HeartIcon className="h-4 w-4"/>}
                 </Button>
+                {query.data.ownerUserId === auth.decodedToken?.sub ?
+                    <Button variant="default" size="icon" onClick={() => {
+                        router.push(`/trail/${params.id}/edit`);
+                    }}>
+                        Edit
+                    </Button> : null}
+                <Map lineString={query.data.lineString}/>
             </div>
         </main>
     )

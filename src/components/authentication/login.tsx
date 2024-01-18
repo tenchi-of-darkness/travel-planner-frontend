@@ -1,4 +1,3 @@
-'use client';
 import React, {Dispatch, SetStateAction, useContext, useMemo} from "react";
 import {Button} from "@/components/ui/button"
 import {getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, UserCredential} from "firebase/auth";

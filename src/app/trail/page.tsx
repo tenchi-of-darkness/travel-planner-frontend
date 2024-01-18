@@ -71,45 +71,48 @@ export default function Trail() {
     showPages.sort();
 
     return (
-        <main>
-            {auth.token !== null ?
-                <Button asChild>
-                    <Link href={{
-                        pathname: '/trail/add',
-                    }}>
-                        Add Trail
-                    </Link>
-                </Button>
-                : null}
-
-            <Pagination>
-                <PaginationContent>
-                    {(page !== 1) ? <PaginationItem>
-                        <PaginationPrevious href={"/trail?page=" + (page - 1)}/>
-                    </PaginationItem> : null}
-
-                    <PaginationItem>
-                        <PaginationLink href="/trail?page=1">1</PaginationLink>
-                    </PaginationItem>
-
-                    {(showPages.length !== 0 && !showPages.includes(2)) ? <PaginationItem>
-                        <PaginationEllipsis/>
-                    </PaginationItem> : null}
-
-                    {showPages.map((innerPage) => <PaginationItem key={"page-" + innerPage}>
-                        <PaginationLink href={"/trail?page=" + (innerPage)}>{innerPage}</PaginationLink>
-                    </PaginationItem>)}
+        <main className={"p-24"}>
 
 
-                    {query.data.length === 15 ? <PaginationItem>
-                        <PaginationNext href={"/trail?page=" + (page + 1)}/>
-                    </PaginationItem> : null}
+            <div className={"flex flex-row p-2"}>
+                {auth.token !== null ?
+                    <Button asChild>
+                        <Link href={{
+                            pathname: '/trail/add',
+                        }}>
+                            Add Trail
+                        </Link>
+                    </Button>
+                    : null}
+                <Pagination>
+                    <PaginationContent>
+                        {(page !== 1) ? <PaginationItem>
+                            <PaginationPrevious href={"/trail?page=" + (page - 1)}/>
+                        </PaginationItem> : null}
+
+                        <PaginationItem>
+                            <PaginationLink href="/trail?page=1">1</PaginationLink>
+                        </PaginationItem>
+
+                        {(showPages.length !== 0 && !showPages.includes(2)) ? <PaginationItem>
+                            <PaginationEllipsis/>
+                        </PaginationItem> : null}
+
+                        {showPages.map((innerPage) => <PaginationItem key={"page-" + innerPage}>
+                            <PaginationLink href={"/trail?page=" + (innerPage)}>{innerPage}</PaginationLink>
+                        </PaginationItem>)}
 
 
-                </PaginationContent>
-            </Pagination>
+                        {query.data.length === 15 ? <PaginationItem>
+                            <PaginationNext href={"/trail?page=" + (page + 1)}/>
+                        </PaginationItem> : null}
 
-            <div className="grid grid-cols-4 p-24 gap-5">
+
+                    </PaginationContent>
+                </Pagination>
+            </div>
+
+            <div className="grid grid-cols-4 gap-5">
                 {query.isSuccess ? <div>{items.length > 0 ? items : "No results found"}</div> : <div>is loading</div>}
             </div>
         </main>

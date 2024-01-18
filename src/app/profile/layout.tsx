@@ -24,6 +24,10 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
         return response!.json();
     }, {enabled: auth.token !== null});
 
+    let userName = query.data?.userName;
+
+    if (userName === null) userName=" ";
+
     return (
         <div className={"flex"}>
             <div className={"flex flex-col"}>
@@ -33,8 +37,8 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
                             <CardHeader className={"p-4"}>
                                 <CardTitle className={"flex items-center gap-2"}><Avatar>
                                     <AvatarImage src={auth.decodedToken.picture}/>
-                                    <AvatarFallback>{query.data.userName[0]}</AvatarFallback>
-                                </Avatar>{query.data.userName}</CardTitle>
+                                    <AvatarFallback>{userName[0]}</AvatarFallback>
+                                </Avatar>{userName}</CardTitle>
                                 <CardDescription className={"break-words max-w-[10rem]"}>{query.data.bio}</CardDescription>
                             </CardHeader>
                         </Card> : null
@@ -61,7 +65,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
                         </NavigationMenuItem>
                         <NavigationMenuItem>
                             <Link href={{
-                                pathname: '/map',
+                                pathname: '/profile/edit',
                             }} legacyBehavior passHref>
                                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                                     Edit profile

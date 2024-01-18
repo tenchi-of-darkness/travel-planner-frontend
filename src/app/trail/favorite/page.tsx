@@ -26,6 +26,8 @@ export default function Trail() {
     const page = parseInt(searchParams.get("page") || "1");
 
     const query = useQuery(["trailsFavorite", auth.token, page], async () => {
+        if(auth.token === null) throw Error("");
+
         return await (await TrailAPI.GetFavoriteTrails(page, auth.token!))?.json();
     });
 

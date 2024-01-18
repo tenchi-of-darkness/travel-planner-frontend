@@ -2,7 +2,7 @@
 
 import useGeolocation from "react-hook-geolocation";
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {useMutation} from "react-query";
+import {useMutation, useQuery} from "react-query";
 import AuthContext from "@/providers/auth_context";
 import {baseApiUrl} from "@/config/base_url";
 import * as z from "zod";
@@ -15,7 +15,14 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Point} from "geojson";
 import {Slider} from "@/components/ui/slider";
 import dynamic from "next/dynamic";
-import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import TrailAPI from "@/api/trail";
+import {
+    Dialog, DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 import {useRouter} from "next/navigation";
 
 const Map = dynamic(() => import('@/app/trail/add/map'), {
@@ -36,18 +43,67 @@ export interface NotInForm {
     end: Point | null;
 }
 
-enum TrailDifficulty {
-    Beginner = 0,
-    Intermediate = 10,
-    Hard = 20
-}
+export default function Page({params}: { params: { id: string } }) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [editDialogOpen, setEditDialogOpen] = useState(false)
 
-export default function Page() {
-    const [dialogOpen, setDialogOpen] = useState(false)
+    const [deleteDialogConfirmed, setDeleteDialogConfirmed] = useState(false)
+    const [editDialogConfirmed, setEditDialogConfirmed] = useState(false)
 
-    const [dialogConfirmed, setDialogConfirmed] = useState(false)
+    const auth = useContext(AuthContext);
+    const [notInForm, setNotInForm] = useState<NotInForm>({start: null, end: null});
+
+    const router = useRouter();
+
+    const query = useQuery(["trail", params.id, auth.token], async () => {
+        return (await TrailAPI.GetTrailById(params.id, auth.token))?.json();
+    }, {
+        refetchInterval: false,
+        refetchIntervalInBackground: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchOnWindowFocus: false,
+        enabled: !!auth.token,
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            return await fetch(`${baseApiUrl}/hike-service/trail/${params.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${auth.token}`,
+                },
+                body: null,
+            }).then(async x => {
+                if (x.ok) {
+                    router.push("/trail");
+                } else {
+                    //Show error
+                }
+            });
+        },
+    })
 
     const location = useGeolocation()
+
+    const mutation = useMutation({
+        mutationFn: async ({form, notInForm}: { form: z.infer<typeof formSchema>, notInForm: NotInForm }) => {
+            return await fetch(`${baseApiUrl}/hike-service/trail`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${auth.token}`,
+                },
+                body: JSON.stringify({id: params.id, ...form, ...notInForm}),
+            }).then(async x => {
+                if (x.ok) {
+                    await query.refetch();
+                }
+            });
+        },
+    })
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -61,45 +117,27 @@ export default function Page() {
         mode: "onChange"
     });
 
-    const auth = useContext(AuthContext);
-    const router = useRouter();
-    const [notInForm, setNotInForm] = useState<NotInForm>({start: null, end: null});
+    async function onDelete() {
+        setDeleteDialogOpen(true)
+    }
 
     useEffect(() => {
-        setNotInForm(x => {
-            return {start: {coordinates: [location.latitude, location.longitude], type: "Point"}, end: x.end}
-        })
-    }, [location.latitude, location.longitude])
-
-    const mutation = useMutation({
-        mutationFn: async ({form, notInForm}: { form: z.infer<typeof formSchema>, notInForm: NotInForm }) => {
-            return await fetch(`${baseApiUrl}/hike-service/trail`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${auth.token}`,
-                },
-                body: JSON.stringify({...form, ...notInForm}),
-            }).then(x => {
-                if(x.ok){
-                    router.push("/trail")
-                }
-            });
-        },
-    })
+        if(deleteDialogConfirmed) deleteMutation.mutate();
+        setDeleteDialogConfirmed(false);
+    }, [deleteDialogConfirmed]);
 
     async function onSubmit(formValues: z.infer<typeof formSchema>) {
         if (!form.formState.isValid || notInForm.start == null || notInForm.end == null) {
             return;
         }
 
-        setDialogOpen(true);
+        setEditDialogOpen(true)
     }
 
     useEffect(() => {
-        if(dialogConfirmed) mutation.mutate({form: form.getValues(), notInForm});
-        setDialogConfirmed(false);
-    }, [dialogConfirmed]);
+        if(editDialogConfirmed)  mutation.mutate({form: form.getValues(), notInForm});
+        setEditDialogConfirmed(false);
+    }, [editDialogConfirmed]);
 
     function renderSwitch(difficulty: number) {
         switch (difficulty) {
@@ -112,6 +150,35 @@ export default function Page() {
             default:
                 return '';
         }
+    }
+
+    function difficultyToNumber(difficulty: string) {
+        switch (difficulty) {
+            case 'Beginner':
+                return 0;
+            case 'Intermediate':
+                return 10;
+            case 'Hard':
+                return 20;
+            default:
+                return 0;
+        }
+    }
+
+    useEffect(() => {
+        if (query.data && query.isSuccess) {
+            form.reset({...query.data, difficulty: difficultyToNumber(query.data.difficulty)});
+            setNotInForm(x => {
+                return {
+                    start: { type: "Point",coordinates: query.data.lineString.coordinates[0]},
+                    end: {type: "Point",coordinates: query.data.lineString.coordinates.slice(-1)[0]},
+                }
+            })
+        }
+    }, [query.data]);
+
+    if (!query.data || !query.isSuccess || !notInForm.start || !notInForm.start.coordinates) {
+        return <></>
     }
 
     return (
@@ -218,12 +285,28 @@ export default function Page() {
                     <Button
                         disabled={!auth.token || !form.formState.isValid || notInForm.start == null || notInForm.end == null}
                         type="submit">Submit</Button>
+                    <Button disabled={!auth.token} type="button" variant="destructive" onClick={onDelete}>Delete</Button>
                 </form>
             </Form>
 
-            <Map setNotInForm={setNotInForm} notInForm={notInForm} isEdit={false} lineString={null} />
+            <Map setNotInForm={setNotInForm} notInForm={notInForm} isEdit={true} lineString={query.data.lineString} />
 
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            {/*Dialogs*/}
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent className="sm:max-w-[425px]" style={{zIndex:51}}>
+                    <DialogHeader>
+                        <DialogTitle>Delete the current trail?</DialogTitle>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button type="submit" onClick={() => {
+                                setDeleteDialogConfirmed(true)
+                            }}>Confirm</Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogContent className="sm:max-w-[425px]" style={{zIndex:51}}>
                     <DialogHeader>
                         <DialogTitle>Confirm the changes to the current trail?</DialogTitle>
@@ -231,7 +314,7 @@ export default function Page() {
                     <DialogFooter>
                         <DialogClose asChild>
                             <Button type="submit" onClick={() => {
-                                setDialogConfirmed(true)
+                                setEditDialogConfirmed(true)
                             }}>Confirm</Button>
                         </DialogClose>
                     </DialogFooter>
